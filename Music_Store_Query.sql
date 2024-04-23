@@ -109,3 +109,46 @@ WHERE
 GROUP BY artist.name
 ORDER BY track_count DESC
 
+/*
+Return all the track names that have a song length longer than the average song length.
+Return the Name and Milliseconds for each track. Order by the song length with the longest songs listed first
+*/
+
+SELECT 
+    name, milliseconds
+FROM
+    track
+WHERE
+    milliseconds > (SELECT 
+            AVG(milliseconds) AS song_length
+        FROM
+            track)
+ORDER BY milliseconds
+
+
+/*
+Find how much amount spent by each customer on artists? Write a query to 
+return customer name, artist name and total spent
+*/
+
+SELECT 
+    CONCAT(customer.first_name,
+            ' ',
+            customer.last_name) AS customer_name,
+    artist.name AS artist_name,
+    ROUND(SUM(invoice_line.quantity * invoice_line.unit_price ), 2) AS spent_amount
+FROM
+    customer
+        JOIN
+    invoice ON invoice.customer_id = customer.customer_id
+        JOIN
+    invoice_line ON invoice_line.invoice_id = invoice.invoice_id
+        JOIN
+    track ON track.track_id = invoice_line.track_id
+        JOIN
+    album2 ON track.album_id = album2.album_id
+        JOIN
+    artist ON artist.artist_id = album2.artist_id
+GROUP BY customer_name , artist_name
+ORDER BY spent_amount DESC
+
